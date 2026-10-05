@@ -7,7 +7,7 @@ import traceback
 
 TOKEN = os.getenv("TOKEN")
 DEVELOPER_ID = 1478853756874395762
-RED_LIGHT_EMOJI = <:redlight:1556394134095265985>
+RED_LIGHT_EMOJI = "<:redlight:1556394134095265985>"
 
 
 def is_dev_or_owner():
