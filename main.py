@@ -6,12 +6,20 @@ import time
 import traceback
 
 TOKEN = os.getenv("TOKEN")
+DEVELOPER_ID = 1478853756874395762
+RED_LIGHT_EMOJI = <:redlight:1556394134095265985>
+
+
+def is_dev_or_owner():
+    async def predicate(ctx):
+        return ctx.author.id == DEVELOPER_ID or ctx.author.id == ctx.guild.owner_id
+    return commands.check(predicate)
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="red?", intents=intents)
 bot.remove_command("help")
 
 RED_LIGHT_EMOJI = "<:redlight:1556394134095265985>"
@@ -161,9 +169,33 @@ async def change_status():
         print(f"Failed to change status: {e}")
 
 
+@bot.command()
+@is_dev_or_owner()
+async def say(ctx, *, text: str = None):
+    if text is None:
+        await ctx.reply(f"Usage: `red?say <text>` — {RED_LIGHT_EMOJI}")
+        return
+    try:
+        await ctx.message.delete()
+    except Exception:
+        pass
+    await ctx.send(f"{RED_LIGHT_EMOJI} {text}")
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    if isinstance(error, commands.CheckFailure):
+        await ctx.reply("You can't use that command.")
+        return
+    print(f"Command error: {error}")
+
+
 @bot.event
 async def on_message(message):
-    return
+    # Red Light still ignores free-form messages, but lets commands through
+    await bot.process_commands(message)
 
 
 try:
